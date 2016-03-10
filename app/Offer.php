@@ -13,4 +13,9 @@ class Offer extends Model
         return $this->belongsTo(GrabbedLink::class);
     }
 
+    public function phones()
+    {
+        return $this->belongsToMany(Phone::class);
+    }
+
 }
