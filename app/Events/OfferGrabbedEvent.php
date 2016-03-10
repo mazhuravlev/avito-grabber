@@ -3,24 +3,24 @@
 namespace App\Events;
 
 use App\Events\Event;
-use App\GrabbedLink;
+use App\Offer;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class LinkGrabbed extends Event
+class OfferGrabbedEvent extends Event
 {
     use SerializesModels;
 
-    private $grabbedLink;
+    public $offer;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(GrabbedLink $grabbedLink)
+    public function __construct(Offer $offer)
     {
-        $this->grabbedLink = $grabbedLink;
+        $this->offer = $offer;
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Events\OfferGrabbedEvent;
 use App\GrabbedLink;
 use App\Offer;
 use App\Phone;
@@ -9,6 +10,7 @@ use GuzzleHttp\Client;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Event;
 use Symfony\Component\DomCrawler\Crawler;
 
 class GrabOffer extends Job implements ShouldQueue
@@ -42,18 +44,25 @@ class GrabOffer extends Job implements ShouldQueue
         $response = $client->get($this->grabbedLink->href);
         $crawler = new Crawler($response->getBody()->getContents());
         $offer = new Offer();
-        $offer->id = $crawler->filter('#item_id')->text();
-        $offer->price_string = $crawler->filter('span[itemprop=price]')->text();
-        $offer->description = $crawler->filter('div[itemprop=description]')->text();
-        $offer->title = $crawler->filter('h1[itemprop=name]')->text();
-        $offer->address = $crawler->filter('div#map')->text();
-        if ($locationNode = $crawler->filter('div[itemprop=address]')->first()) {
-            $offer->user_address = $locationNode->text();
-        }
+        $offer->id = self::getText($crawler, '#item_id');
+        $offer->price_string = self::getText($crawler, 'span[itemprop=price]');
+        $offer->description = self::getText($crawler, 'div[itemprop=description]');
+        $offer->title = self::getText($crawler, 'h1[itemprop=name]');
+        $offer->address = self::getText($crawler, 'div#map');
+        $offer->user_address = self::getText($crawler, 'div[itemprop=address]');
         $offer->cat_path = $crawler->filter('.breadcrumb-link')->last()->attr('href');
-        $this->grabbedLink->offer()->save($offer);
+        /** @var Offer $offer */
+        $offer = $this->grabbedLink->offer()->save($offer);
+        Event::fire(new OfferGrabbedEvent($offer));
+    }
 
-
+    private static function getText(Crawler $crawler, $selector)
+    {
+        try {
+            return $crawler->filter($selector)->text();
+        } catch (\InvalidArgumentException $e) {
+            return null;
+        }
     }
 
 

@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Events\LinkGrabbed;
+use App\Events\LinkGrabbedEvent;
 use App\GrabbedLink;
 use App\System\LinkGrabber;
 use GuzzleHttp\Client;
@@ -48,7 +48,7 @@ class GrabLinks extends Job implements ShouldQueue
                 $link = GrabbedLink::where(['href' => $linkHref])->first();
                 if (!$link) {
                     $grabbedLink = GrabbedLink::create(['href' => $linkHref]);
-                    Event::fire(new LinkGrabbed($grabbedLink));
+                    Event::fire(new LinkGrabbedEvent($grabbedLink));
                     $newLinksGrabbed++;
                 }
             }
