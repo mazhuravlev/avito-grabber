@@ -4,6 +4,8 @@ namespace App\Console;
 
 
 use App\Console\Commands\GrabLinks;
+use App\Console\Commands\GrabOffer;
+use App\Console\Commands\GrabPhone;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -16,6 +18,8 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         GrabLinks::class,
+        GrabOffer::class,
+        GrabPhone::class,
     ];
 
     /**
