@@ -59,7 +59,7 @@ class GrabOffer extends Job implements ShouldQueue
     private static function getText(Crawler $crawler, $selector)
     {
         try {
-            return $crawler->filter($selector)->text();
+            return trim($crawler->filter($selector)->text());
         } catch (\InvalidArgumentException $e) {
             return null;
         }
