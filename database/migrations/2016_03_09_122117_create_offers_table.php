@@ -20,7 +20,7 @@ class CreateOffersTable extends Migration
             $table->string('price_string');
             $table->string('cat_path');
             $table->string('address');
-            $table->string('user_address');
+            $table->string('user_address')->nullable();
             $table->text('details')->nullable();
             $table->timestamps();
             $table->unsignedInteger('grabbed_link_id');
