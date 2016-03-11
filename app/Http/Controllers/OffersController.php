@@ -19,7 +19,7 @@ class OffersController extends Controller
 
     public function offer(Offer $offer)
     {
-        $offer->load(['phones', 'grabbedLink']);
+        $offer->load(['phones', 'grabbedLink', 'photos']);
         return view('offer')->with([
             'offer' => $offer
         ]);

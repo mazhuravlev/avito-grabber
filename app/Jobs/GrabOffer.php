@@ -53,6 +53,13 @@ class GrabOffer extends Job implements ShouldQueue
         $offer->cat_path = $crawler->filter('.breadcrumb-link')->last()->attr('href');
         /** @var Offer $offer */
         $offer = $this->grabbedLink->offer()->save($offer);
+        if ($photoNodes = $crawler->filter('a.gallery-link') and $photoNodes->count()) {
+            foreach ($photoNodes->extract('href') as $photoHref) {
+                $offer->photos()->create([
+                    'href' => $photoHref
+                ]);
+            }
+        }
         Event::fire(new OfferGrabbedEvent($offer));
     }
 
