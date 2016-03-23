@@ -16,7 +16,7 @@ class CreateProxiesTable extends Migration
         Schema::create('proxies', function (Blueprint $table) {
             $table->increments('id');
             $table->string('ip');
-            $table->smallInteger('port');
+            $table->unsignedInteger('port');
             $table->string('login')->nullablle();
             $table->string('password')->nullablle();
             $table->unsignedInteger('hits')->default(0);
