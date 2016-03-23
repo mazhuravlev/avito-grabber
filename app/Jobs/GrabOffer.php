@@ -6,6 +6,7 @@ use App\Events\OfferGrabbedEvent;
 use App\GrabbedLink;
 use App\Offer;
 use App\Phone;
+use App\System\ProxyClient;
 use GuzzleHttp\Client;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -34,13 +35,9 @@ class GrabOffer extends Job implements ShouldQueue
      *
      * @return void
      */
-    public function handle(Client $client = null)
+    public function handle()
     {
-        if (is_null($client)) {
-            $client = new Client(
-                ['base_uri' => 'http://avito.ru']
-            );
-        }
+        $client = new ProxyClient(new Client(['base_uri' => 'http://avito.ru']));
         $response = $client->get($this->grabbedLink->href);
         $crawler = new Crawler($response->getBody()->getContents());
         $offer = new Offer();

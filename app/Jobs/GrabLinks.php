@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Events\LinkGrabbedEvent;
 use App\GrabbedLink;
 use App\System\LinkGrabber;
+use App\System\ProxyClient;
 use GuzzleHttp\Client;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -37,11 +38,13 @@ class GrabLinks extends Job implements ShouldQueue
      */
     public function handle()
     {
-        $client = new Client(['base_uri' => 'https://m.avito.ru/respublika_krym/nedvizhimost']);
+        $client = new ProxyClient(
+            new Client(['base_uri' => 'https://m.avito.ru'])
+        );
         $page = 0;
         while (true) {
             $newLinksGrabbed = 0;
-            $response = $client->get('', ['query' => ['p' => $page, 'hist_back' => '1']]);
+            $response = $client->get('/respublika_krym/nedvizhimost', ['query' => ['p' => $page, 'hist_back' => '1']]);
             $links = LinkGrabber::grabLinks($response->getBody()->getContents());
             foreach ($links as $linkHref) {
                 /** @var GrabbedLink $link */
