@@ -38,7 +38,8 @@ class GrabOffer extends Job implements ShouldQueue
     public function handle()
     {
         $client = new ProxyClient(new Client(['base_uri' => 'http://avito.ru']));
-        $response = $client->get($this->grabbedLink->href);
+        $avitoId = preg_match('/\d{9,}$/', $this->grabbedLink->href, $matches);
+        $response = $client->get($avitoId ? $matches[0] : $this->grabbedLink->href);
         $crawler = new Crawler($response->getBody()->getContents());
         $offer = new Offer();
         $offer->id = self::getText($crawler, '#item_id');

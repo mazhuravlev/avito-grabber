@@ -31,12 +31,15 @@ class ProxyClient
         $usedProxies = [];
         while ($triesLeft) {
             try {
+                if (!$proxy) {
+                    $proxy = Proxy::best()->first();
+                }
                 if ($proxy) {
                     printf('PROXY: %s:%s (%d hits/ %d fails): %s' . PHP_EOL, $proxy->ip, $proxy->port, $proxy->hits, $proxy->fails, $url);
                     return $this->withProxy($proxy, $url, $options);
                 }
             } catch (ProxyException $e) {
-                printf('PROXY FAIL' . PHP_EOL, $proxy->ip, $proxy->port, $proxy->hits, $proxy->fails);
+                printf('PROXY FAIL: %s' . PHP_EOL, $e->getPrevious()->getMessage(), $proxy->ip, $proxy->port, $proxy->hits, $proxy->fails);
                 $triesLeft--;
                 array_push($usedProxies, $proxy->id);
                 $proxy = Proxy::best()->whereNotIn('id', $usedProxies)->first();
@@ -54,6 +57,7 @@ class ProxyClient
         $options['proxy'] = ['https' => self::formatProxy($proxy)];
         $options['connect_timeout'] = 5;
         $options['timeout'] = 5;
+        //$options['debug'] = true;
         $response = null;
         try {
             $response = $this->client->get($url, $options);
